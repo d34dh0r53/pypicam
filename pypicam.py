@@ -9,10 +9,9 @@
 # sudo apt-get install python-imaging-tk python-picamera
 
 import io
-# import subprocess
 import os
-# import time
 import picamera
+import time
 from datetime import datetime
 from PIL import Image
 
@@ -29,12 +28,13 @@ from PIL import Image
 #  - location of folder to save photos
 # filenamePrefix
 #  - string that prefixes the file name for easier identification of files.
-# diskSpaceToReserve 
+# diskSpaceToReserve
 #  - Delete oldest images to avoid filling disk. How much byte to keep free
 #    on disk.
 # cameraSettings
-#  - "" = no extra settings; "-hf" = Set horizontal flip of image; 
-#  "-vf" = Set vertical flip; "-hf -vf" = both horizontal and vertical flip
+#  "" = no extra settings
+#  "hflip" = Set horizontal flip of image
+#  "vflip" = Set vertical flip of the image
 threshold = 10
 sensitivity = 20
 forceCapture = True
@@ -93,10 +93,10 @@ testBorders = [[[1, testWidth], [1, testHeight]]]
 # in debug mode, a file debug.bmp is written to disk with marked changed
 # pixel an with marked border of scan-area
 # debug mode should only be turned on while testing the parameters above
-debugMode = False  # False or True
+debugMode = True  # False or True
 
 
-# Capyture a small test image (for motion detection)
+# Capture a small test image (for motion detection)
 def captureTestImage(settings, width, height):
     imageData = io.BytesIO()
     with picamera.PiCamera() as camera:
@@ -109,28 +109,88 @@ def captureTestImage(settings, width, height):
     return im, buffer
 
 
-def captureImage(settings, width, height, quality, diskSpaceToReserve):
+# Capture the full image and save it to disk
+def captureImage(settings, width, height, jpegQuality, diskSpaceToReserve):
     keepDiskSpaceFree(diskSpaceToReserve)
     time = datetime.now()
-    filename = filenamePrefix + "-%04d%02d%02d-%0d2%02d%02d.jpg".format(
+    filename = filenamePrefix + "-%04d%02d%02d-%0d2%02d%02d.jpg" % (
         time.year, time.month, time.day, time.hour, time.minute, time.second
     )
-    outFile = os.path.join(filepath, filename)
-    print outFile
+    outfile = os.path.join(filepath, filename)
+    with picamera.PiCamera() as camera:
+        if 'hflip' in settings:
+            camera.hflip = True
+        if 'vflip' in settings:
+            camera.vflip = True
+        camera.resolution = (width, height)
+        camera.capture(outfile, quality=jpegQuality)
 
 
+# Check on our free space
 def keepDiskSpaceFree(diskSpaceToReserve):
     return
 
-captureImage('', 100, 100, 100, 100)
-image1, buffer1 = captureTestImage(cameraSettings, testWidth, testHeight)
-debugimage = Image.new("RGB", (testWidth, testHeight))
-debugim = debugimage.load()
 
-for z in xrange(0, testAreaCount):
-    for x in xrange(testBorders[z][1][0]-1, testBorders[z][0][1]):
-        for y in xrange(testBorders[z][1][0]-1, testBorders[z][1][1]):
-            debugim[x, y] = buffer1[x, y]
+# Do the motion detection
+def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
 
-debugimage.save('debug.bmp')
+    # If debugMode is true we create a debug bitmap
+    if (debugMode):
+        debugimage = Image.new("RGB", (testWidth, testHeight))
+        debugim = debugimage.load()
 
+    changedPixels = 0
+    takePicture = False
+    for z in xrange(0, testAreaCount):
+        for x in xrange(testBorders[z][1][0]-1, testBorders[z][0][1]):
+            for y in xrange(testBorders[z][1][0]-1, testBorders[z][1][1]):
+                if (debugMode):
+                    debugim[x, y] = buffer2[x, y]
+                    if (
+                            (x == testBorders[z][0][0]-1) or
+                            (x == testBorders[z][0][1]-1) or
+                            (y == testBorders[z][1][0]-1) or
+                            (y == testBorders[z][1][1]-1)):
+                        debugim[x][y] = (0, 0, 255)
+                # Check the green channel for motion as it has the greatest
+                # contrast
+                pixdiff = abs(buffer1[x, y][1] - buffer2[x, y][1])
+                if (pixdiff > threshold):
+                    changedPixels += 1
+                    if (debugMode):
+                        # Make the changed pixels green
+                        debugim[x][y] = (0, 255, 0)
+                if (changedPixels > sensitivity):
+                    takePicture = True
+                # Break out of the loops if we're taking the picture
+                # and we're not in debug mode
+                if ((not debugMode) and takePicture):
+                    break
+            if ((not debugMode) and takePicture):
+                break
+        if ((not debugMode) and takePicture):
+            break
+    if (debugMode):
+        debugimage.save('debug.bmp')
+    return takePicture
+
+
+if __name__ == "__main__":
+    image1, buffer1 = captureTestImage(cameraSettings, testWidth, testHeight)
+
+    while (True):
+        image2, buffer2 = captureTestImage(cameraSettings, testWidth,
+                                           testHeight)
+
+        if detectMotion(image1, buffer1, image2, buffer2, testAreaCount,
+                        testBorders):
+            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality,
+                         diskSpaceToReserve)
+            lastCapture = time.time()
+
+        if (forceCapture and time.time() - lastCapture > forceCaptureTime):
+            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality,
+                         diskSpaceToReserve)
+            lastCapture = time.time()
+
+        image1, buffer1 = image2, buffer2
