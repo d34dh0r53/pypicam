@@ -122,6 +122,7 @@ def captureImage(settings, width, height, quality, diskSpaceToReserve):
 def keepDiskSpaceFree(diskSpaceToReserve):
     return
 
+captureImage('', 100, 100, 100, 100)
 image1, buffer1 = captureTestImage(cameraSettings, testWidth, testHeight)
 debugimage = Image.new("RGB", (testWidth, testHeight))
 debugim = debugimage.load()
