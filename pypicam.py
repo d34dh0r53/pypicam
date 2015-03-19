@@ -151,7 +151,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
                             (x == testBorders[z][0][1]-1) or
                             (y == testBorders[z][1][0]-1) or
                             (y == testBorders[z][1][1]-1)):
-                        debugim[x][y] = (0, 0, 255)
+                        debugim[x, y] = (0, 0, 255)
                 # Check the green channel for motion as it has the greatest
                 # contrast
                 pixdiff = abs(buffer1[x, y][1] - buffer2[x, y][1])
@@ -159,7 +159,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
                     changedPixels += 1
                     if (debugMode):
                         # Make the changed pixels green
-                        debugim[x][y] = (0, 255, 0)
+                        debugim[x, y] = (0, 255, 0)
                 if (changedPixels > sensitivity):
                     takePicture = True
                 # Break out of the loops if we're taking the picture
@@ -177,6 +177,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
 
 if __name__ == "__main__":
     image1, buffer1 = captureTestImage(cameraSettings, testWidth, testHeight)
+    lastCapture = time.time()
 
     while (True):
         image2, buffer2 = captureTestImage(cameraSettings, testWidth,
