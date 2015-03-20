@@ -29,9 +29,6 @@ from PIL import Image
 #  - location of folder to save photos
 # filenamePrefix
 #  - string that prefixes the file name for easier identification of files.
-# diskSpaceToReserve
-#  - Delete oldest images to avoid filling disk. How much byte to keep free
-#    on disk.
 # cameraSettings
 #  "" = no extra settings
 #  "hflip" = Set horizontal flip of image
@@ -40,10 +37,9 @@ from PIL import Image
 threshold = 20
 sensitivity = 20
 forceCapture = True
-forceCaptureTime = 60 * 10  # Once an hour
+forceCaptureTime = 60 * 10
 filepath = "/home/pi/picam"
 filenamePrefix = "capture"
-diskSpaceToReserve = 40 * 1024 * 1024  # Keep 40 mb free on disk
 cameraSettings = ""
 
 # settings of the photos to save
@@ -115,8 +111,7 @@ def captureTestImage(settings, width, height):
 
 
 # Capture the full image and save it to disk
-def captureImage(settings, width, height, jpegQuality, diskSpaceToReserve):
-    keepDiskSpaceFree(diskSpaceToReserve)
+def captureImage(settings, width, height, jpegQuality):
     time = datetime.now()
     filename = filenamePrefix + "-%04d%02d%02d-%0d2%02d%02d.jpg" % (
         time.year, time.month, time.day, time.hour, time.minute, time.second
@@ -132,11 +127,6 @@ def captureImage(settings, width, height, jpegQuality, diskSpaceToReserve):
         camera.resolution = (width, height)
         camera.capture(outfile, quality=jpegQuality)
     print "Captured {}".format(outfile)
-
-
-# Check on our free space
-def keepDiskSpaceFree(diskSpaceToReserve):
-    return
 
 
 # Do the motion detection
@@ -197,13 +187,11 @@ if __name__ == "__main__":
 
         if detectMotion(image1, buffer1, image2, buffer2, testAreaCount,
                         testBorders, debugCounter):
-            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality,
-                         diskSpaceToReserve)
+            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality)
             lastCapture = time.time()
 
         if (forceCapture and time.time() - lastCapture > forceCaptureTime):
-            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality,
-                         diskSpaceToReserve)
+            captureImage(cameraSettings, saveWidth, saveHeight, saveQuality)
             lastCapture = time.time()
 
         image1, buffer1 = image2, buffer2
