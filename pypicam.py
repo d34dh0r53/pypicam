@@ -36,7 +36,7 @@ from PIL import Image
 #  "" = no extra settings
 #  "hflip" = Set horizontal flip of image
 #  "vflip" = Set vertical flip of the image
-threshold = 10
+threshold = 20
 sensitivity = 20
 forceCapture = True
 forceCaptureTime = 60 * 60  # Once an hour
