@@ -113,7 +113,7 @@ def captureTestImage(settings, width, height):
 # Capture the full image and save it to disk
 def captureImage(settings, width, height, jpegQuality):
     time = datetime.now()
-    filename = filenamePrefix + "-%04d%02d%02d-%0d2%02d%02d.jpg" % (
+    filename = filenamePrefix + "-%04d%02d%02d-%02d%02d%02d.jpg" % (
         time.year, time.month, time.day, time.hour, time.minute, time.second
     )
     outfile = os.path.join(filepath, filename)
