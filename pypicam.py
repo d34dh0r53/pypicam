@@ -96,7 +96,7 @@ testBorders = [[[1, 500], [1, 400]], [[1, 800], [401, 600]]]
 # pixel an with marked border of scan-area
 # debug mode should only be turned on while testing the parameters above
 debugMode = True
-debugCounter = 20
+debugPics = 20
 
 
 # Capture a small test image (for motion detection)
@@ -181,7 +181,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders,
         if ((not debugMode) and takePicture):
             break
     if (debugMode):
-        debugimage.save('debug-' + debugCounter + '.bmp')
+        debugimage.save('debug-' + str(debugCounter) + '.bmp')
         print "Debug Image {} Written".format(debugCounter)
     return takePicture
 
