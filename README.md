@@ -1,4 +1,4 @@
-pypicam
+PyPiCam
 =======
 
 Python implementation of motion detection timelapse software for the
@@ -10,4 +10,4 @@ TODO
 * Flask application to stream jpegs from cloudfiles
 * Alternate motion detection algorithms, convolution matrix, H.264 motion
   vector
-
+* Daemonize PyPiCam
