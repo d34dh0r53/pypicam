@@ -39,7 +39,7 @@ from PIL import Image
 threshold = 20
 sensitivity = 20
 forceCapture = True
-forceCaptureTime = 60 * 60  # Once an hour
+forceCaptureTime = 60 * 10  # Once an hour
 filepath = "/home/pi/picam"
 filenamePrefix = "capture"
 diskSpaceToReserve = 40 * 1024 * 1024  # Keep 40 mb free on disk
