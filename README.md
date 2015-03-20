@@ -25,12 +25,15 @@ borders.
 
 Test areas and borders are the exlusion zones for the motion capture
 algorithm(s) and are defined as a list of x,y pairs defining the corners
-of a box in the image.
+of a box in the image. From TFC:
+
+
 
 TODO
 ----
 * Automatic upload to cloudfiles/swift
-* Flask application to stream jpegs from cloudfiles
+* Flask application to stream jpegs from cloudfiles based on Miguels work
+  here: https://github.com/miguelgrinberg/flask-video-streaming
 * Alternate motion detection algorithms, convolution matrix, H.264 motion
   vector
 * Daemonize PyPiCam
