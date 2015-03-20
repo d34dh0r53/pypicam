@@ -57,7 +57,7 @@ testHeight = 600
 # this is the default setting, if the whole image should be scanned for
 # changed pixel
 testAreaCount = 1
-testBorders = [[[600, 800], [1, 400]]]
+testBorders = [[[1, 600], [1, 600]]]
 
 # [ [[start pixel on left side,end pixel on right side],
 #  [start pixel on top side,stop pixel on bottom side]] ]
@@ -147,6 +147,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
         for x in xrange(testBorders[z][0][0]-1, testBorders[z][0][1]):
             for y in xrange(testBorders[z][1][0]-1, testBorders[z][1][1]):
                 if (debugMode):
+                    # Mark the borders of the test area blue
                     debugim[x, y] = buffer2[x, y]
                     if (
                             (x == testBorders[z][0][0]-1) or
