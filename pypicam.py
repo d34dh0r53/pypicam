@@ -57,7 +57,7 @@ testHeight = 600
 # this is the default setting, if the whole image should be scanned for
 # changed pixel
 testAreaCount = 2
-testBorders = [[[1, 500], [1, 400]], [[501, 800], [401, 600]]]
+testBorders = [[[1, 500], [1, 400]], [[1, 800], [401, 600]]]
 
 # [ [[start pixel on left side,end pixel on right side],
 #  [start pixel on top side,stop pixel on bottom side]] ]
