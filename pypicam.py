@@ -36,6 +36,7 @@ from PIL import Image
 #  "" = no extra settings
 #  "hflip" = Set horizontal flip of image
 #  "vflip" = Set vertical flip of the image
+#  "noled" = Turn off the camera LED
 threshold = 20
 sensitivity = 20
 forceCapture = True
@@ -94,7 +95,8 @@ testBorders = [[[1, 500], [1, 400]], [[1, 800], [401, 600]]]
 # in debug mode, a file debug.bmp is written to disk with marked changed
 # pixel an with marked border of scan-area
 # debug mode should only be turned on while testing the parameters above
-debugMode = True  # False or True
+debugMode = True
+debugCounter = 20
 
 
 # Capture a small test image (for motion detection)
@@ -102,6 +104,8 @@ def captureTestImage(settings, width, height):
     imageData = io.BytesIO()
     with picamera.PiCamera() as camera:
         camera.resolution = (width, height)
+        if 'noled' in settings:
+            camera.led = False
         camera.capture(imageData, format='bmp')
     imageData.seek(0)
     im = Image.open(imageData)
@@ -123,6 +127,8 @@ def captureImage(settings, width, height, jpegQuality, diskSpaceToReserve):
             camera.hflip = True
         if 'vflip' in settings:
             camera.vflip = True
+        if 'noled' in settings:
+            camera.led = False
         camera.resolution = (width, height)
         camera.capture(outfile, quality=jpegQuality)
     print "Captured {}".format(outfile)
@@ -134,7 +140,8 @@ def keepDiskSpaceFree(diskSpaceToReserve):
 
 
 # Do the motion detection
-def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
+def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders,
+                 debugCounter=0):
 
     # If debugMode is true we create a debug bitmap
     if (debugMode):
@@ -174,21 +181,22 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
         if ((not debugMode) and takePicture):
             break
     if (debugMode):
-        debugimage.save('debug.bmp')
-        print "Debug Image Written"
+        debugimage.save('debug-' + debugCounter + '.bmp')
+        print "Debug Image {} Written".format(debugCounter)
     return takePicture
 
 
 if __name__ == "__main__":
     image1, buffer1 = captureTestImage(cameraSettings, testWidth, testHeight)
     lastCapture = time.time()
+    debugCounter = 0
 
     while (True):
         image2, buffer2 = captureTestImage(cameraSettings, testWidth,
                                            testHeight)
 
         if detectMotion(image1, buffer1, image2, buffer2, testAreaCount,
-                        testBorders):
+                        testBorders, debugCounter):
             captureImage(cameraSettings, saveWidth, saveHeight, saveQuality,
                          diskSpaceToReserve)
             lastCapture = time.time()
@@ -199,3 +207,8 @@ if __name__ == "__main__":
             lastCapture = time.time()
 
         image1, buffer1 = image2, buffer2
+        if (debugMode):
+            if debugCounter == debugPics:
+                debugCounter = 0
+            else:
+                debugCounter += 1
