@@ -3,6 +3,7 @@
 # Based on original picam by brianflakes, improved by pageauc, peewee2
 # and Kesthal
 # Modified to use multiple storage backend and provide a pure python interface
+# by Dave Wilde <david.wilde@rackspace.com>
 
 # PIL and python-picamera are required to run this script
 # sudo apt-get update
@@ -50,8 +51,8 @@ saveHeight = 972
 saveQuality = 15  # Set jpeg quality (0 to 100)
 
 # Test-Image settings
-testWidth = 100
-testHeight = 75
+testWidth = 800
+testHeight = 600
 
 # this is the default setting, if the whole image should be scanned for
 # changed pixel
@@ -124,6 +125,7 @@ def captureImage(settings, width, height, jpegQuality, diskSpaceToReserve):
             camera.vflip = True
         camera.resolution = (width, height)
         camera.capture(outfile, quality=jpegQuality)
+    print "Captured {}".format(outfile)
 
 
 # Check on our free space
