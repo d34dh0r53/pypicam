@@ -144,7 +144,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
     changedPixels = 0
     takePicture = False
     for z in xrange(0, testAreaCount):
-        for x in xrange(testBorders[z][1][0]-1, testBorders[z][0][1]):
+        for x in xrange(testBorders[z][0][0]-1, testBorders[z][0][1]):
             for y in xrange(testBorders[z][1][0]-1, testBorders[z][1][1]):
                 if (debugMode):
                     debugim[x, y] = buffer2[x, y]
