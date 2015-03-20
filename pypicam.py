@@ -174,6 +174,7 @@ def detectMotion(image1, buffer1, image2, buffer2, testAreaCount, testBorders):
             break
     if (debugMode):
         debugimage.save('debug.bmp')
+        print "Debug Image Written"
     return takePicture
 
 
